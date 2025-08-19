@@ -68,7 +68,7 @@ jobs:
         uses: spetersenms/AL-Go/Actions/ReadSettings@ALCodeAnalysisTracking
         with:
           shell: powershell
-          get: shortLivedArtifactsRetentionDays
+          get: shortLivedArtifactsRetentionDays,trackCodeCopIssuesInGitHub
 
       - name: Set AL Code Analysis Var output
         id: SetALCodeAnalysisVar
