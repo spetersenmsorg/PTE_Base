@@ -47,6 +47,7 @@ jobs:
       baselineWorkflowSHA: ${{ steps.determineProjectsToBuild.outputs.BaselineWorkflowSHA }}
       workflowDepth: ${{ steps.DetermineWorkflowDepth.outputs.WorkflowDepth }}
       powerPlatformSolutionFolder: ${{ steps.DeterminePowerPlatformSolutionFolder.outputs.powerPlatformSolutionFolder }}
+      trackCodeCopIssuesInGitHub: ${{ steps.SetALCodeAnalysisVar.outputs.trackCodeCopIssuesInGitHub }}
     steps:
       - name: Dump Workflow Information
         uses: spetersenms/AL-Go/Actions/DumpWorkflowInfo@ALCodeAnalysisTracking
@@ -54,7 +55,7 @@ jobs:
           shell: powershell
 
       - name: Checkout
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           lfs: true
 
@@ -69,7 +70,13 @@ jobs:
         uses: spetersenms/AL-Go/Actions/ReadSettings@ALCodeAnalysisTracking
         with:
           shell: powershell
-          get: type,powerPlatformSolutionFolder,useGitSubmodules
+          get: type,powerPlatformSolutionFolder,useGitSubmodules,trackCodeCopIssuesInGitHub
+
+      - name: Set AL Code Analysis Var output
+        id: SetALCodeAnalysisVar
+        run: |
+          Write-Host "trackCodeCopIssuesInGitHub environment variable: '$($env:trackCodeCopIssuesInGitHub)'"
+          Add-Content -Encoding UTF8 -Path $env:GITHUB_OUTPUT -Value "trackCodeCopIssuesInGitHub=$($env:trackCodeCopIssuesInGitHub)"
 
       - name: Read submodules token
         id: ReadSubmodulesToken
@@ -82,7 +89,7 @@ jobs:
 
       - name: Checkout Submodules
         if: env.useGitSubmodules != 'false' && env.useGitSubmodules != ''
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           lfs: true
           submodules: ${{ env.useGitSubmodules }}
@@ -147,7 +154,7 @@ jobs:
     runs-on: [ windows-latest ]
     steps:
       - name: Checkout
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Read settings
         uses: spetersenms/AL-Go/Actions/ReadSettings@ALCodeAnalysisTracking
@@ -200,22 +207,16 @@ jobs:
 
   CodeAnalysisUpload:
     needs: [ Initialization, Build ]
-    if: (!cancelled())
+    if: (!cancelled()) && (needs.Initialization.outputs.trackCodeCopIssuesInGitHub == 'True')
     runs-on: [ windows-latest ]
     name: Code Analysis Processing
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: Read settings
-        uses: spetersenms/AL-Go/Actions/ReadSettings@ALCodeAnalysisTracking
-        with:
-          shell: powershell
-          get: trackCodeCopIssuesInGitHub
-
       - name: Download artifacts - ErrorLogs
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
-        if: (success() || failure()) && env.trackCodeCopIssuesInGitHub == 'True'
+        if: (success() || failure())
         with:
           pattern: '*-ErrorLogs-*'
           path: '${{ github.workspace }}/ErrorLogs/'
@@ -223,14 +224,14 @@ jobs:
 
       - name: Process AL Code Analysis Logs
         id: ProcessALCodeAnalysisLogs
-        if: (success() || failure()) && env.trackCodeCopIssuesInGitHub == 'True'
+        if: (success() || failure())
         uses: spetersenms/AL-Go/Actions/ProcessALCodeAnalysisLogs@ALCodeAnalysisTracking
         with:
           shell: powershell
 
       - name: Upload SARIF file to GitHub
         uses: github/codeql-action/upload-sarif@v3
-        if: always() && env.trackCodeCopIssuesInGitHub == 'True'
+        if: always()
         with:
           sarif_file: '${{ github.workspace }}/ErrorLogs/output.sarif.json'
           category: "ALCodeAnalysis"
@@ -250,7 +251,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Download artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
@@ -273,7 +274,7 @@ jobs:
           artifacts: '.artifacts'
 
       - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
         with:
           path: ".aldoc/_site/"
 
@@ -299,7 +300,7 @@ jobs:
       ALGoEnvName: ${{ matrix.environment }}
     steps:
       - name: Checkout
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Download artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
@@ -361,7 +362,7 @@ jobs:
     name: Deliver to ${{ matrix.deliveryTarget }}
     steps:
       - name: Checkout
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Download artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
@@ -398,7 +399,7 @@ jobs:
     runs-on: [ windows-latest ]
     steps:
       - name: Checkout
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Finalize the workflow
         id: PostProcess

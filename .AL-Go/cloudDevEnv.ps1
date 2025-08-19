@@ -55,7 +55,7 @@ $GitHubHelperPath = DownloadHelperFile -url 'https://raw.githubusercontent.com/s
 $ReadSettingsModule = DownloadHelperFile -url 'https://raw.githubusercontent.com/spetersenms/AL-Go/ALCodeAnalysisTracking/Actions/.Modules/ReadSettings.psm1' -folder $tmpFolder
 $debugLoggingModule = DownloadHelperFile -url 'https://raw.githubusercontent.com/spetersenms/AL-Go/ALCodeAnalysisTracking/Actions/.Modules/DebugLogHelper.psm1' -folder $tmpFolder
 $ALGoHelperPath = DownloadHelperFile -url 'https://raw.githubusercontent.com/spetersenms/AL-Go/ALCodeAnalysisTracking/Actions/AL-Go-Helper.ps1' -folder $tmpFolder
-DownloadHelperFile -url 'https://raw.githubusercontent.com/spetersenms/AL-Go/ALCodeAnalysisTracking/Actions/settings.schema.json' -folder $tmpFolder | Out-Null
+DownloadHelperFile -url 'https://raw.githubusercontent.com/spetersenms/AL-Go/ALCodeAnalysisTracking/Actions/.Modules/settings.schema.json' -folder $tmpFolder | Out-Null
 DownloadHelperFile -url 'https://raw.githubusercontent.com/spetersenms/AL-Go/ALCodeAnalysisTracking/Actions/Packages.json' -folder $tmpFolder | Out-Null
 
 Import-Module $GitHubHelperPath
