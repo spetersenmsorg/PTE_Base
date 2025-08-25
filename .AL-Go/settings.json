@@ -9,6 +9,5 @@
   "pageScriptingTests": [
     "Recordings"
   ],
-  "artifact": "//*//latest",
-  "githubRunner": "self-hosted"
+  "artifact": "//*//latest"
 }
