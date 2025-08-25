@@ -1,14 +1,14 @@
 {
-  "$schema": "https://raw.githubusercontent.com/spetersenms/AL-Go/OnlyPurgeALGoContainers/Actions/settings.schema.json",
+  "$schema": "https://raw.githubusercontent.com/spetersenms/AL-Go/ReadSettingsOutputVar/Actions/settings.schema.json",
   "type": "PTE",
-  "templateUrl": "https://github.com/spetersenms/AL-Go@OnlyPurgeALGoContainers",
+  "templateUrl": "https://github.com/spetersenms/AL-Go@ReadSettingsOutputVar",
   "generateDependencyArtifact": true,
   "incrementalBuilds": {
     "onPush": true,
     "onPull_Request": true,
     "mode": "modifiedApps"
   },
-  "templateSha": "0b9d79f8a4decd0466f7dcbababfeed1f1e99d2a",
+  "templateSha": "6c65905bd0cc2705cb4e04eab9eba728abbecf74",
   "enableCodeCop": true,
   "enableUICop": true,
   "rulesetFile": "rulesets/ruleset.json",
