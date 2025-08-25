@@ -6,9 +6,6 @@
   ],
   "testFolders": [],
   "bcptTestFolders": [],
-  "pageScriptingTests": [
-    "Recordings"
-  ],
   "artifact": "//*//latest",
   "githubRunner": "self-hosted"
 }
