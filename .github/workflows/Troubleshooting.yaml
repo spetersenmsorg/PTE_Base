@@ -30,7 +30,7 @@ jobs:
           lfs: true
 
       - name: Troubleshooting
-        uses: spetersenms/AL-Go/Actions/Troubleshooting@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/Troubleshooting@ALCodeAnalysisTracking
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}

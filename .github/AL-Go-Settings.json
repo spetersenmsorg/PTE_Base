@@ -1,14 +1,14 @@
 {
-  "$schema": "https://raw.githubusercontent.com/spetersenms/AL-Go/ReadSettingsOutputVar/Actions/settings.schema.json",
+  "$schema": "https://raw.githubusercontent.com/spetersenms/AL-Go/ALCodeAnalysisTracking/Actions/.Modules/settings.schema.json",
   "type": "PTE",
-  "templateUrl": "https://github.com/spetersenms/AL-Go@ReadSettingsOutputVar",
+  "templateUrl": "https://github.com/spetersenms/AL-Go@ALCodeAnalysisTracking",
   "generateDependencyArtifact": true,
   "incrementalBuilds": {
     "onPush": true,
     "onPull_Request": true,
     "mode": "modifiedApps"
   },
-  "templateSha": "398ea25ddc4f744cf894c8630165a96e15cb746f",
+  "templateSha": "e250f0242114a3205f976811a14c32a77cf93e55",
   "enableCodeCop": true,
   "enableUICop": true,
   "rulesetFile": "rulesets/ruleset.json",

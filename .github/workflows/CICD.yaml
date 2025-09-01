@@ -18,6 +18,7 @@ permissions:
   contents: read
   id-token: write
   pages: read
+  security-events: write
 
 env:
   workflowDepth: 1
@@ -44,11 +45,12 @@ jobs:
       buildOrderJson: ${{ steps.determineProjectsToBuild.outputs.BuildOrderJson }}
       baselineWorkflowRunId: ${{ steps.determineProjectsToBuild.outputs.BaselineWorkflowRunId }}
       baselineWorkflowSHA: ${{ steps.determineProjectsToBuild.outputs.BaselineWorkflowSHA }}
-      workflowDepth: ${{ env.workflowDepth }}
-      powerPlatformSolutionFolder: ${{ fromJson(steps.ReadSettings.outputs.SelectedSettingsJson).powerPlatformSolutionFolder }}
+      workflowDepth: ${{ steps.DetermineWorkflowDepth.outputs.WorkflowDepth }}
+      powerPlatformSolutionFolder: ${{ steps.DeterminePowerPlatformSolutionFolder.outputs.powerPlatformSolutionFolder }}
+      trackALAlertsInGithub: ${{ steps.SetALCodeAnalysisVar.outputs.trackALAlertsInGithub }}
     steps:
       - name: Dump Workflow Information
-        uses: spetersenms/AL-Go/Actions/DumpWorkflowInfo@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/DumpWorkflowInfo@ALCodeAnalysisTracking
         with:
           shell: powershell
 
@@ -59,21 +61,27 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: spetersenms/AL-Go/Actions/WorkflowInitialize@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/WorkflowInitialize@ALCodeAnalysisTracking
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: spetersenms/AL-Go/Actions/ReadSettings@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/ReadSettings@ALCodeAnalysisTracking
         with:
           shell: powershell
-          get: type,powerPlatformSolutionFolder,useGitSubmodules
+          get: type,powerPlatformSolutionFolder,useGitSubmodules,trackALAlertsInGithub
+
+      - name: Set AL Code Analysis Var output
+        id: SetALCodeAnalysisVar
+        run: |
+          Write-Host "trackALAlertsInGithub environment variable: '$($env:trackALAlertsInGithub)'"
+          Add-Content -Encoding UTF8 -Path $env:GITHUB_OUTPUT -Value "trackALAlertsInGithub=$($env:trackALAlertsInGithub)"
 
       - name: Read submodules token
         id: ReadSubmodulesToken
         if: env.useGitSubmodules != 'false' && env.useGitSubmodules != ''
-        uses: spetersenms/AL-Go/Actions/ReadSecrets@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/ReadSecrets@ALCodeAnalysisTracking
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -87,16 +95,27 @@ jobs:
           submodules: ${{ env.useGitSubmodules }}
           token: '${{ fromJson(steps.ReadSubmodulesToken.outputs.Secrets).gitSubmodulesToken }}'
 
+      - name: Determine Workflow Depth
+        id: DetermineWorkflowDepth
+        run: |
+          Add-Content -Encoding UTF8 -Path $env:GITHUB_OUTPUT -Value "WorkflowDepth=$($env:workflowDepth)"
+
       - name: Determine Projects To Build
         id: determineProjectsToBuild
-        uses: spetersenms/AL-Go/Actions/DetermineProjectsToBuild@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/DetermineProjectsToBuild@ALCodeAnalysisTracking
         with:
           shell: powershell
           maxBuildDepth: ${{ env.workflowDepth }}
 
+      - name: Determine PowerPlatform Solution Folder
+        id: DeterminePowerPlatformSolutionFolder
+        if: env.type == 'PTE'
+        run: |
+          Add-Content -Encoding UTF8 -Path $env:GITHUB_OUTPUT -Value "powerPlatformSolutionFolder=$($env:powerPlatformSolutionFolder)"
+
       - name: Determine Delivery Target Secrets
         id: DetermineDeliveryTargetSecrets
-        uses: spetersenms/AL-Go/Actions/DetermineDeliveryTargets@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/DetermineDeliveryTargets@ALCodeAnalysisTracking
         with:
           shell: powershell
           projectsJson: '${{ steps.determineProjectsToBuild.outputs.ProjectsJson }}'
@@ -104,7 +123,7 @@ jobs:
 
       - name: Read secrets
         id: ReadSecrets
-        uses: spetersenms/AL-Go/Actions/ReadSecrets@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/ReadSecrets@ALCodeAnalysisTracking
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -112,7 +131,7 @@ jobs:
 
       - name: Determine Delivery Targets
         id: DetermineDeliveryTargets
-        uses: spetersenms/AL-Go/Actions/DetermineDeliveryTargets@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/DetermineDeliveryTargets@ALCodeAnalysisTracking
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -122,7 +141,7 @@ jobs:
 
       - name: Determine Deployment Environments
         id: DetermineDeploymentEnvironments
-        uses: spetersenms/AL-Go/Actions/DetermineDeploymentEnvironments@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/DetermineDeploymentEnvironments@ALCodeAnalysisTracking
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -138,21 +157,21 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Read settings
-        uses: spetersenms/AL-Go/Actions/ReadSettings@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/ReadSettings@ALCodeAnalysisTracking
         with:
           shell: powershell
           get: templateUrl
 
       - name: Read secrets
         id: ReadSecrets
-        uses: spetersenms/AL-Go/Actions/ReadSecrets@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/ReadSecrets@ALCodeAnalysisTracking
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
           getSecrets: 'ghTokenWorkflow'
 
       - name: Check for updates to AL-Go system files
-        uses: spetersenms/AL-Go/Actions/CheckForUpdates@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/CheckForUpdates@ALCodeAnalysisTracking
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -186,6 +205,37 @@ jobs:
       useArtifactCache: true
       needsContext:  ${{ toJson(needs) }}
 
+  CodeAnalysisUpload:
+    needs: [ Initialization, Build ]
+    if: (!cancelled()) && (needs.Initialization.outputs.trackALAlertsInGithub == 'True')
+    runs-on: [ windows-latest ]
+    name: Code Analysis Processing
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Download artifacts - ErrorLogs
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        if: (success() || failure())
+        with:
+          pattern: '*-ErrorLogs-*'
+          path: '${{ github.workspace }}/ErrorLogs/'
+          merge_multiple: true
+
+      - name: Process AL Code Analysis Logs
+        id: ProcessALCodeAnalysisLogs
+        if: (success() || failure())
+        uses: spetersenms/AL-Go/Actions/ProcessALCodeAnalysisLogs@ALCodeAnalysisTracking
+        with:
+          shell: powershell
+
+      - name: Upload SARIF file to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: '${{ github.workspace }}/ErrorLogs/output.sarif.json'
+          category: "ALCodeAnalysis"
+
   DeployALDoc:
     needs: [ Initialization, Build ]
     if: (!cancelled()) && (needs.Build.result == 'success' || needs.Build.result == 'skipped') && needs.Initialization.outputs.generateALDocArtifact == 1 && github.ref_name == 'main'
@@ -209,7 +259,7 @@ jobs:
           path: '.artifacts'
 
       - name: Read settings
-        uses: spetersenms/AL-Go/Actions/ReadSettings@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/ReadSettings@ALCodeAnalysisTracking
         with:
           shell: powershell
 
@@ -218,7 +268,7 @@ jobs:
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
 
       - name: Build Reference Documentation
-        uses: spetersenms/AL-Go/Actions/BuildReferenceDocumentation@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/BuildReferenceDocumentation@ALCodeAnalysisTracking
         with:
           shell: powershell
           artifacts: '.artifacts'
@@ -258,7 +308,7 @@ jobs:
           path: '.artifacts'
 
       - name: Read settings
-        uses: spetersenms/AL-Go/Actions/ReadSettings@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/ReadSettings@ALCodeAnalysisTracking
         with:
           shell: ${{ matrix.shell }}
           get: type,powerPlatformSolutionFolder
@@ -272,7 +322,7 @@ jobs:
 
       - name: Read secrets
         id: ReadSecrets
-        uses: spetersenms/AL-Go/Actions/ReadSecrets@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/ReadSecrets@ALCodeAnalysisTracking
         with:
           shell: ${{ matrix.shell }}
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -280,7 +330,7 @@ jobs:
 
       - name: Deploy to Business Central
         id: Deploy
-        uses: spetersenms/AL-Go/Actions/Deploy@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/Deploy@ALCodeAnalysisTracking
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -292,7 +342,7 @@ jobs:
 
       - name: Deploy to Power Platform
         if: env.type == 'PTE' && env.powerPlatformSolutionFolder != ''
-        uses: spetersenms/AL-Go/Actions/DeployPowerPlatform@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/DeployPowerPlatform@ALCodeAnalysisTracking
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -320,20 +370,20 @@ jobs:
           path: '.artifacts'
 
       - name: Read settings
-        uses: spetersenms/AL-Go/Actions/ReadSettings@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/ReadSettings@ALCodeAnalysisTracking
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: spetersenms/AL-Go/Actions/ReadSecrets@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/ReadSecrets@ALCodeAnalysisTracking
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
           getSecrets: '${{ matrix.deliveryTarget }}Context'
 
       - name: Deliver
-        uses: spetersenms/AL-Go/Actions/Deliver@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/Deliver@ALCodeAnalysisTracking
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -353,7 +403,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: spetersenms/AL-Go/Actions/WorkflowPostProcess@ReadSettingsOutputVar
+        uses: spetersenms/AL-Go/Actions/WorkflowPostProcess@ALCodeAnalysisTracking
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
