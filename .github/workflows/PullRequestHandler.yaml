@@ -29,7 +29,7 @@ jobs:
     if: (github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name) && (github.event_name != 'pull_request')
     runs-on: windows-latest
     steps:
-      - uses: spetersenms/AL-Go/Actions/VerifyPRChanges@ALCodeAnalysisTracking
+      - uses: spetersenms/AL-Go/Actions/VerifyPRChanges@main
 
   Initialization:
     needs: [ PregateCheck ]
@@ -47,7 +47,7 @@ jobs:
       trackALAlertsInGithub: ${{ steps.SetALCodeAnalysisVar.outputs.trackALAlertsInGithub }}
     steps:
       - name: Dump Workflow Information
-        uses: spetersenms/AL-Go/Actions/DumpWorkflowInfo@ALCodeAnalysisTracking
+        uses: spetersenms/AL-Go/Actions/DumpWorkflowInfo@main
         with:
           shell: powershell
 
@@ -59,13 +59,13 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: spetersenms/AL-Go/Actions/WorkflowInitialize@ALCodeAnalysisTracking
+        uses: spetersenms/AL-Go/Actions/WorkflowInitialize@main
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: spetersenms/AL-Go/Actions/ReadSettings@ALCodeAnalysisTracking
+        uses: spetersenms/AL-Go/Actions/ReadSettings@main
         with:
           shell: powershell
           get: shortLivedArtifactsRetentionDays,trackALAlertsInGithub
@@ -84,7 +84,7 @@ jobs:
 
       - name: Determine Projects To Build
         id: determineProjectsToBuild
-        uses: spetersenms/AL-Go/Actions/DetermineProjectsToBuild@ALCodeAnalysisTracking
+        uses: spetersenms/AL-Go/Actions/DetermineProjectsToBuild@main
         with:
           shell: powershell
           maxBuildDepth: ${{ env.workflowDepth }}
@@ -137,7 +137,7 @@ jobs:
       - name: Process AL Code Analysis Logs
         id: ProcessALCodeAnalysisLogs
         if: (success() || failure())
-        uses: spetersenms/AL-Go/Actions/ProcessALCodeAnalysisLogs@ALCodeAnalysisTracking
+        uses: spetersenms/AL-Go/Actions/ProcessALCodeAnalysisLogs@main
         with:
           shell: powershell
 
@@ -158,7 +158,7 @@ jobs:
     steps:
       - name: Pull Request Status Check
         id: PullRequestStatusCheck
-        uses: spetersenms/AL-Go/Actions/PullRequestStatusCheck@ALCodeAnalysisTracking
+        uses: spetersenms/AL-Go/Actions/PullRequestStatusCheck@main
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -166,7 +166,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: spetersenms/AL-Go/Actions/WorkflowPostProcess@ALCodeAnalysisTracking
+        uses: spetersenms/AL-Go/Actions/WorkflowPostProcess@main
         if: success() || failure()
         env:
           GITHUB_TOKEN: ${{ github.token }}
