@@ -9,5 +9,5 @@
   "pageScriptingTests": [
     "Recordings"
   ],
-  "artifact": "//*//first"
+  "artifact": "bcinsider//*//first"
 }
