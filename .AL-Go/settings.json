@@ -9,5 +9,8 @@
   "pageScriptingTests": [
     "Recordings"
   ],
-  "artifact": "bcinsider//*//first"
+  "artifact": "bcinsider//*//first",
+  "useCompilerFolder": false,
+  "doNotPublishApps": false,
+  "doNotRunTests": false
 }
