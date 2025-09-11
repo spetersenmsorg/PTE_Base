@@ -1,14 +1,14 @@
 {
-  "$schema": "https://raw.githubusercontent.com/spetersenms/AL-Go/main/Actions/.Modules/settings.schema.json",
+  "$schema": "https://raw.githubusercontent.com/microsoft/AL-Go-Actions/v7.3/.Modules/settings.schema.json",
   "type": "PTE",
-  "templateUrl": "https://github.com/spetersenms/AL-Go@main",
+  "templateUrl": "https://github.com/microsoft/AL-Go-PTE@main",
   "generateDependencyArtifact": true,
   "incrementalBuilds": {
     "onPush": true,
     "onPull_Request": true,
     "mode": "modifiedApps"
   },
-  "templateSha": "62f89daf74d193c3bd2931fdc54f66bf49e47be7",
+  "templateSha": "920b9e1a65667be8e6d54cb478fae5f2847aa3ea",
   "enableCodeCop": true,
   "enableUICop": true,
   "rulesetFile": "rulesets/ruleset.json",
