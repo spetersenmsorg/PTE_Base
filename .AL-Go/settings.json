@@ -12,5 +12,8 @@
   "artifact": "bcinsider//*//first",
   "useCompilerFolder": false,
   "doNotPublishApps": false,
-  "doNotRunTests": false
+  "doNotRunTests": false,
+  "DeployToDemo": {
+    "Branches": ["main"]
+  }
 }
