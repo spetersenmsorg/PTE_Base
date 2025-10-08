@@ -12,5 +12,8 @@
   "enableCodeCop": true,
   "enableUICop": true,
   "rulesetFile": "rulesets/ruleset.json",
-  "trackALAlertsInGitHub": true
+  "trackALAlertsInGitHub": true,
+  "DeployToTest": {
+    "EnvironmentName": "a32100_p32004_US_26-0"
+  }
 }
