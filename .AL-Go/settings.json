@@ -10,8 +10,8 @@
     "Recordings"
   ],
   "artifact": "//*//first",
-  "useCompilerFolder": false,
-  "doNotPublishApps": false,
+  "useCompilerFolder": true,
+  "doNotPublishApps": true,
   "doNotRunTests": false,
   "DeployToDemo": {
     "Branches": ["main"]
