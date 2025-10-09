@@ -1,14 +1,14 @@
 {
-  "$schema": "https://raw.githubusercontent.com/microsoft/AL-Go/bugsbash/v8.0/Actions/.Modules/settings.schema.json",
+  "$schema": "https://raw.githubusercontent.com/aholstrup1/AL-Go/aholstrup/codeanalysis_defensivecheck/Actions/.Modules/settings.schema.json",
   "type": "PTE",
-  "templateUrl": "https://github.com/microsoft/AL-Go@bugsbash/v8.0",
+  "templateUrl": "https://github.com/aholstrup1/AL-Go@aholstrup/codeanalysis_defensivecheck",
   "generateDependencyArtifact": true,
   "incrementalBuilds": {
     "onPush": true,
     "onPull_Request": true,
     "mode": "modifiedApps"
   },
-  "templateSha": "444922717a7b006b8b8b7a8c1375b1baf2a2261d",
+  "templateSha": "e497b8a935f3ac554d2b944668ae6ec7aafcf2a9",
   "enableCodeCop": true,
   "enableUICop": true,
   "rulesetFile": "rulesets/ruleset.json",
